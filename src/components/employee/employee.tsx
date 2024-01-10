@@ -13,7 +13,7 @@ import http from '../../utils/http';
 import { User } from '../../interfaces/models/user';
 import { handleErrorResponse } from '../../utils';
 import { Avatar, Modal } from 'antd';
-import { FiPlus, FiPlusSquare, FiUsers } from 'react-icons/fi';
+import { FiDelete, FiPlus, FiPlusSquare, FiUsers } from 'react-icons/fi';
 import ReactDOM from 'react-dom';
 import SalaryDetailsModal from '../salary/SalaryDetailsModal';
 import { utilService } from '../common/util';
@@ -22,7 +22,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 import SalarySetupModal from '../salary/SalarySetupModal';
 import CreateEmployee from './CreateEmployee';
-
+import { MdDelete } from "react-icons/md";
+import { ApiStatus } from '../../interfaces/models/apistatus';
 
 export default function employee() {
     const columns: TableColumn<User>[] = [
@@ -52,18 +53,18 @@ export default function employee() {
         },
         {
             name: "Action",
+            width: '250px',
             cell: (row) => {
-                return <div>
-                    {/* <SalaryDetailsModal open={false} onClose={toggleModal}>
-                    <div>
-                        Main Content goes here!
-                    </div>
-                </SalaryDetailsModal> */}
+                return <div >
+                    <button style={{ backgroundColor: "rgb(8 145 178)" }} className="text-white px-2 py-1 rounded w-px-auto text-sm mr-5" onClick={(event) => action(row, event)}>
+                        Salary
+                    </button>
                     <button style={{ backgroundColor: "rgb(8 145 178)" }} className="text-white px-2 py-1 rounded w-px-auto text-sm mr-5" onClick={(event) => addEmployee(row.id)}>
                         Edit
                     </button>
-                    <button style={{ backgroundColor: "rgb(8 145 178)" }} className="text-white px-2 py-1 rounded w-px-auto text-sm" onClick={(event) => action(row, event)}>
-                        Salary History
+
+                    <button style={{ backgroundColor: "rgb(8 145 178)" }} className="text-white px-2 py-1 rounded w-px-auto text-sm" onClick={(event) => deleteEmployee(row)}>
+                        Delete
                     </button>
                     {modalContextHolde}
                 </div>;
@@ -138,6 +139,12 @@ export default function employee() {
         const result = data.filter(item => item.firstName.toLowerCase().startsWith(search.toLowerCase()) || item.lastName.toLowerCase().startsWith(search.toLowerCase()));
         setFilter(result);
     }, [search]);
+
+    // useEffect(() => {
+    //     console.log("inside filter")
+    //     const result = data.filter(item => item.firstName.toLowerCase().startsWith(search.toLowerCase()) || item.lastName.toLowerCase().startsWith(search.toLowerCase()));
+    //     setFilter(result);
+    // }, [removedItem]);
 
     const disburseSalary = (state: any) => {
         console.log("Inside disburseSalary");
@@ -224,7 +231,50 @@ export default function employee() {
             //     console.log();
             // }
         });
-        console.log(addEmpModal);
+    }
+
+    const deleteEmployee = (user: User) => {
+        console.log("Inside deleteEmployee");
+        modal.confirm({
+            title: 'Confirm removing employee',
+            content: <div>
+                <h1>Name: {user.firstName + " " + user.lastName}</h1>
+                <h1>Rank: {"Grade-" + user.rank}</h1>
+                <h1>Date of Joining: {user.joiningDate}</h1>
+            </div>,
+            closable: true,
+            icon: false,
+            maskClosable: true,
+            // okText: '',
+            // cancelText: '',
+            // okButtonProps: {
+            //     className: 'bg-primary',
+            // },
+            onOk: () => {
+                http.delete(apiRoutes.deleteEmployee, {
+                    params: {
+                        userId: user.id
+                    }
+                })
+                    .then((response) => {
+                        const res: ApiStatus = response.data;
+
+                        if (res.jobDone) {
+                            utilService.successToast("Employee removed");
+                            const result = filter.filter(item => item.id != user.id);
+                            setFilter(result);
+                        } else {
+                            utilService.successToast("Couldn't remove employee. Try later");
+                        }
+
+                    })
+                    .catch((error) => {
+                        handleErrorResponse(error);
+                        utilService.successToast("Couldn't remove employee. Try later");
+                    });
+            }
+        });
+
     }
     return (
         <React.Fragment>

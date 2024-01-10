@@ -11,7 +11,7 @@ const CONFIG = {
     helpLink: '',
     enablePWA: true,
     theme: {
-        accentColor: '#818cf8',
+        accentColor: '#747edf',
         sidebarLayout: LayoutType.MIX,
         showBreadcrumb: true,
     },

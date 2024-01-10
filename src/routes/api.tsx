@@ -7,6 +7,7 @@ export const apiRoutes = {
     updateUser: `${API_URL}/user/update`,
     employeeInfo: `${API_URL}/user/employee`,
     users: `${API_URL}/user/employees`,
+    deleteEmployee: `${API_URL}/user/remove`,
     fetchBasicSalary: `${API_URL}/salary/get-basic-salary`,
     updateBasicSalary: `${API_URL}/salary/basic-salary`,
     fetchCompanySalaryAc: `${API_URL}/salary/get-company-balance`,
