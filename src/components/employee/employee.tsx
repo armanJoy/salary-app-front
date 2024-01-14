@@ -42,7 +42,7 @@ export default function employee() {
         },
         {
             name: "Rank",
-            selector: (row) => row.rank,
+            selector: (row) => 'Grade-' + row.rank,
             center: true,
             sortable: true,
         },
@@ -290,9 +290,9 @@ export default function employee() {
                 actions={
 
                     <span className='z-10'>
-                        <button className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded w-px-auto text-sm mr-10" onClick={(key) => openSalarySetup(1)}>
+                        {/* <button className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded w-px-auto text-sm mr-10" onClick={(key) => openSalarySetup(1)}>
                             Basic Salary
-                        </button>
+                        </button> */}
 
                         <button className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded w-px-auto text-sm mr-10" onClick={(key) => openSalarySetup(2)}>
                             Company Balance

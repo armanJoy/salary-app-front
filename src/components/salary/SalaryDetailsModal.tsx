@@ -55,6 +55,18 @@ export default function SalaryDetailsModal(props: ModalProps): ReturnType<FC> {
     //     })
     // }
 
+    const updateEmpSalary = (updated: any) => {
+        const data = [...empSalary];
+        // console.log(data);
+        for (let index = 0; index < data.length; index++) {
+            if (data[index].smonth == updated.smonth && data[index].syear == updated.syear) {
+                data[index] = updated;
+                data[index].isNew = true;
+                break;
+            }
+        }
+        setEmpSalary(data);
+    }
 
     const payDueSalary = async (salaryInfo: any, event: any) => {
         console.log("Inside payDueSalary");
@@ -65,7 +77,8 @@ export default function SalaryDetailsModal(props: ModalProps): ReturnType<FC> {
                 console.log(res);
                 if (res.jobDone) {
                     utilService.successToast("Payment successful");
-                    getSalaryDetails();
+                    updateEmpSalary(res.data);
+                    // getSalaryDetails();
                 } else {
                     utilService.warnToast(res.msg);
                 }
@@ -95,15 +108,21 @@ export default function SalaryDetailsModal(props: ModalProps): ReturnType<FC> {
         //     selector: (row) => row.id,
         //     center: true
         // },
-        // {
-        //     name: "Rank",
-        //     selector: (row) => row.rank,
-        //     center: true,
-        //     sortable: true,
-        // },
         {
-            name: "Salary",
-            cell: (row) => (row.disbursed) ? row.samount : <button style={{ backgroundColor: "rgb(8 145 178)" }} className="text-white px-2 py-1 rounded w-px-auto text-base" onClick={(event) => payDueSalary(row, event)}>
+            name: "Amount",
+            cell: (row) => row.samount,
+            center: true,
+            sortable: true,
+        },
+        {
+            name: "Status",
+            cell: (row) => (row.disbursed) ? ((row.isNew) ? "Paid (New)" : "Paid") : "Unpaid",
+            center: true,
+            sortable: true,
+        },
+        {
+            name: "Action",
+            cell: (row) => <button style={{ display: (row.disbursed) ? 'none' : '', backgroundColor: "rgb(8 145 178)" }} className="text-white px-2 py-1 rounded w-px-auto text-base" onClick={(event) => payDueSalary(row, event)}>
                 Pay Now
             </button>,
             center: true,

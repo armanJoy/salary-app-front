@@ -46,6 +46,7 @@ export default function SalaryDisburseModal(props: ModalProps): ReturnType<FC> {
             .then((response) => {
                 console.log(response.data);
                 setBasicSalary(response.data.balance);
+                form.setFieldValue("basicSalary", response.data.balance);
             })
             .catch((error) => {
                 handleErrorResponse(error);
@@ -54,15 +55,14 @@ export default function SalaryDisburseModal(props: ModalProps): ReturnType<FC> {
     }
 
     const updateBasicSalary = () => {
-        const promise = http.patch(apiRoutes.updateBasicSalary, {
-            params: {
-                newBasicSalary: basicSalary
-            }
-        })
+        console.log(form.getFieldValue("basicSalary"));
+        const promise = http.patch(apiRoutes.updateBasicSalary + "?newBasicSalary=" + form.getFieldValue("basicSalary"))
             .then((response) => {
                 console.log(response.data);
                 if (response.data.jobDone) {
                     utilService.successToast(response.data.msg);
+                    setBasicSalary(response.data.balance);
+                    form.setFieldValue("basicSalary", 0);
                 } else {
                     utilService.warnToast(response.data.msg);
                 }
@@ -80,6 +80,7 @@ export default function SalaryDisburseModal(props: ModalProps): ReturnType<FC> {
             .then((response) => {
                 console.log(response.data);
                 setCompanyBalance(response.data.balance);
+                form.setFieldValue("newBalance", 0);
             })
             .catch((error) => {
                 handleErrorResponse(error);
@@ -89,16 +90,21 @@ export default function SalaryDisburseModal(props: ModalProps): ReturnType<FC> {
 
 
     const updateCompanyBalance = () => {
-        const promise = http.get(apiRoutes.updateCompanySalaryAc, { params: { newBalance: companyBalance } })
+        console.log(form.getFieldValue("newBalance"));
+        const promise = http.patch(apiRoutes.updateCompanySalaryAc + "?newBalance=" + form.getFieldValue("newBalance"))
             .then((response) => {
                 console.log(response.data);
                 if (response.data.jobDone) {
                     utilService.successToast(response.data.msg);
+                    setCompanyBalance(response.data.balance);
+                    form.setFieldValue("newBalance", response.data.balance);
                 } else {
                     utilService.warnToast(response.data.msg);
                 }
             })
             .catch((error) => {
+                const errorMsg = (error.response.data.msg) ? error.response.data.msg : error.response.data.message;
+                utilService.warnToast(errorMsg);
                 handleErrorResponse(error);
             });
         toast.promise(promise, {
@@ -127,25 +133,21 @@ export default function SalaryDisburseModal(props: ModalProps): ReturnType<FC> {
                 }
             >
                 <div className='flex mt-4'>
-
                     <Form.Item hidden={props.flag == 2}
                         name="basicSalary"
                         label={
                             <p className="block text-sm font-medium text-gray-900">Basic Salary</p>
                         }
                     >
-
-
                         <Input placeholder="" value={basicSalary} type='number' className="bg-gray-50 text-gray-900 sm:text-sm py-1.5" />
-
                     </Form.Item>
                     <Form.Item hidden={props.flag == 1}
                         name="newBalance"
                         label={
-                            <p className="block text-sm font-medium text-gray-900">New Balance</p>
+                            <p className="block text-sm font-medium text-gray-900">Add-up Balance</p>
                         }
                     >
-                        <Input placeholder="" type='number' value={1000} className="bg-gray-50 text-gray-900 sm:text-sm py-1.5" />
+                        <Input placeholder="" type='number' value={companyBalance} className="bg-gray-50 text-gray-900 sm:text-sm py-1.5" />
                     </Form.Item>
                 </div>
 
